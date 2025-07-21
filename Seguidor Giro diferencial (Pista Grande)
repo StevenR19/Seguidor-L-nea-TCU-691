@@ -1,0 +1,111 @@
+El giro diferencial es una técnica que produce un viraje mucho más fluido y estable, similar a como gira un coche.
+
+Consiste en hacer que la rueda interior de la curva se mueva más despacio que la rueda exterior. 
+Como la rueda de afuera debe recorrer una distancia mayor en el mismo tiempo, esta diferencia 
+de velocidades provoca que el vehículo gire de forma natural y controlada, en lugar de pivotar bruscamente.
+
+
+// INICIO CÓDIGO
+// =================================================================
+//   Seguidor
+// =================================================================
+
+// --- Pines de Sensores y Motores ---
+const int sensorIzquierdo = 11;
+const int sensorDerecho = 10;
+const int enA = 9; // Motor Izquierdo (A)
+const int in1 = 8;
+const int in2 = 7;
+const int enB = 6; // Motor Derecho (B)
+const int in3 = 5;
+const int in4 = 4;
+
+// --- Velocidades para giro diferencial ---
+int velocidadRecta = 160;
+int velocidadExteriorCurva = 190;
+int velocidadInteriorCurva = 80;
+
+void setup() {
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(enB, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+  pinMode(sensorIzquierdo, INPUT);
+  pinMode(sensorDerecho, INPUT);
+}
+
+void loop() {
+  int estadoIzquierdo = digitalRead(sensorIzquierdo);
+  int estadoDerecho = digitalRead(sensorDerecho);
+
+  // --- LÓGICA DE SENSORES INVERTIDA (0 = BLANCO, 1 = NEGRO) ---
+
+
+  // Si ambos sensores ven BLANCO (0), avanza.
+  if (estadoIzquierdo == LOW && estadoDerecho == LOW) {
+    avanzar();
+  }
+  // Si el derecho ve NEGRO (1) y el izquierdo BLANCO (0), gira a la derecha.
+  else if (estadoIzquierdo == LOW && estadoDerecho == HIGH) {
+    girarDerechaDiferencial();
+  }
+  // Si el izquierdo ve NEGRO (1) y el derecho BLANCO (0), gira a la izquierda.
+  else if (estadoIzquierdo == HIGH && estadoDerecho == LOW) {
+    girarIzquierdaDiferencial();
+  }
+  // Para cualquier otro caso (como ambos en NEGRO (1)), se detiene.
+  else {
+    detener();
+  }
+}
+
+// =======================================================
+//        FUNCIONES DE MOVIMIENTO
+// =======================================================
+
+void avanzar() {
+  // Motor Izquierdo (A) hacia adelante (lógica invertida del motor)
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(enA, velocidadRecta);
+
+  // Motor Derecho (B) hacia adelante
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, velocidadRecta);
+}
+
+void girarDerechaDiferencial() {
+  // Motor Izquierdo (A) - Exterior
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(enA, velocidadExteriorCurva);
+
+  // Motor Derecho (B) - Interior
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, velocidadInteriorCurva);
+}
+
+void girarIzquierdaDiferencial() {
+  // Motor Izquierdo (A) - Interior
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(enA, velocidadInteriorCurva);
+
+  // Motor Derecho (B) - Exterior
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, velocidadExteriorCurva);
+}
+
+void detener() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+  analogWrite(enA, 0);
+  analogWrite(enB, 0);
+}
