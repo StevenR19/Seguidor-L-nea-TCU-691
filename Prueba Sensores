@@ -1,0 +1,38 @@
+Esta Prueba es para ver que los sensores esten bien calibrados, se debe observar en el serial monitor de Arduino IDE
+un cambio de 0 a 1 o viceversa en cuanto se cambia la superficie a negra o blanca
+
+// INICIO CÓDIGO
+// --- CÓDIGO DE DIAGNÓSTICO DE SENSORES EN PINES D10 Y D11 ---
+
+// Define los nuevos pines para los sensores.
+const int sensorIzquierdo = 11;
+const int sensorDerecho = 10;
+
+void setup() {
+  // Inicia la comunicación con la computadora para poder ver los mensajes.
+  Serial.begin(9600);
+  
+  // Configura los pines de los sensores como entradas.
+  pinMode(sensorIzquierdo, INPUT);
+  pinMode(sensorDerecho, INPUT);
+
+  // Mensaje de inicio para saber que el código está corriendo.
+  Serial.println("--- Prueba de Sensores Iniciada ---");
+  Serial.println("Mueve los sensores sobre blanco y negro para ver los cambios.");
+}
+
+void loop() {
+  // Lee el estado digital de cada sensor (0 para LOW, 1 para HIGH).
+  int estadoIzquierdo = digitalRead(sensorIzquierdo);
+  int estadoDerecho = digitalRead(sensorDerecho);
+
+  // Imprime los valores en el Monitor Serie de forma clara.
+  Serial.print("Sensor Izquierdo (D11): ");
+  Serial.print(estadoIzquierdo);
+  Serial.print("  |  ");
+  Serial.print("Sensor Derecho (D10): ");
+  Serial.println(estadoDerecho);
+  
+  // Pequeña pausa para que la lectura sea fácil de seguir.
+  delay(200); 
+}
