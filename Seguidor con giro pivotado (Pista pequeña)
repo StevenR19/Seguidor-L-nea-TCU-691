@@ -1,0 +1,104 @@
+// El giro pivotado se refiere a girar deteniendo una rueda, es decir, girando sobre su propio eje
+
+// INICIO DEL CÓDIGO
+// =================================================================
+//  Seguidor
+// =================================================================
+
+// --- Pines de Sensores y Motores ---
+const int sensorIzquierdo = 11;
+const int sensorDerecho = 10;
+const int enA = 9; // Motor Izquierdo (A)
+const int in1 = 8;
+const int in2 = 7;
+const int enB = 6; // Motor Derecho (B)
+const int in3 = 5;
+const int in4 = 4;
+
+// --- VELOCIDADES MUY BAJAS PARA MÁXIMO CONTROL ---
+int velocidadRecta = 150;   // Velocidad de avance muy controlada.
+int velocidadGiro = 120;  // Velocidad de la rueda exterior al girar.
+
+void setup() {
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(enB, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+  pinMode(sensorIzquierdo, INPUT);
+  pinMode(sensorDerecho, INPUT);
+}
+
+void loop() {
+  int estadoIzquierdo = digitalRead(sensorIzquierdo);
+  int estadoDerecho = digitalRead(sensorDerecho);
+
+  // Lógica de sensores (0 = BLANCO, 1 = NEGRO)
+  if (estadoIzquierdo == LOW && estadoDerecho == LOW) {
+    avanzar();
+  } 
+  // Al detectar una curva, llamamos a las funciones de giro de pivote.
+  else if (estadoIzquierdo == LOW && estadoDerecho == HIGH) {
+    girarDerechaPivote();
+  } 
+  else if (estadoIzquierdo == HIGH && estadoDerecho == LOW) {
+    girarIzquierdaPivote();
+  } 
+  else {
+    detener();
+  }
+}
+
+// =======================================================
+//        FUNCIONES DE MOVIMIENTO CON GIRO DE PIVOTE
+// =======================================================
+
+void avanzar() {
+  // Motor Izquierdo (A) hacia adelante
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(enA, velocidadRecta);
+
+  // Motor Derecho (B) hacia adelante
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, velocidadRecta);
+}
+
+void girarDerechaPivote() {
+  // GIRO DERECHA: Rueda exterior (izquierda) avanza, rueda interior (derecha) se detiene.
+  
+  // Motor Izquierdo (A) - Exterior
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(enA, velocidadGiro);
+
+  // Motor Derecho (B) - Interior (DETENIDO)
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, 0);
+}
+
+void girarIzquierdaPivote() {
+  // GIRO IZQUIERDA: Rueda exterior (derecha) avanza, rueda interior (izquierda) se detiene.
+
+  // Motor Izquierdo (A) - Interior (DETENIDO)
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  analogWrite(enA, 0);
+
+  // Motor Derecho (B) - Exterior
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enB, velocidadGiro);
+}
+
+void detener() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+  analogWrite(enA, 0);
+  analogWrite(enB, 0);
+}
